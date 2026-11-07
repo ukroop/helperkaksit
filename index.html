@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Motion — как жить дальше</title>
+<style>
+  :root {
+    --black: #050807;
+    --green: #0c2a1e;
+    --accent: #3ddc97;
+    --text: #cfe8dd;
+    --muted: #7fa595;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    color: var(--text);
+    cursor: none;
+  }
+
+  body {
+    background: linear-gradient(135deg, var(--black), var(--green), var(--black));
+    background-size: 400% 400%;
+    animation: flow 24s ease-in-out infinite;
+    overflow-x: hidden;
+  }
+
+  @keyframes flow {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Зелёное свечение у курсора */
+  .glow {
+    position: fixed;
+    top: 0; left: 0;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(61,220,151,0.35), rgba(61,220,151,0.08) 45%, transparent 70%);
+    transform: translate(-50%, -50%);
+    transition: opacity .4s ease;
+    z-index: 1;
+    filter: blur(6px);
+  }
+
+  /* Собственный курсор */
+  .dot {
+    position: fixed;
+    top: 0; left: 0;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px 3px rgba(61,220,151,0.7);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 3;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 64px 24px 96px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 300;
+    letter-spacing: .08em;
+    margin: 0 0 12px;
+    color: #eafff6;
+    text-shadow: 0 0 30px rgba(61,220,151,0.25);
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 540px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  section {
+    background: rgba(8, 20, 15, 0.55);
+    border: 1px solid rgba(61,220,151,0.12);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 28px;
+    backdrop-filter: blur(10px);
+    transition: border-color .5s ease, transform .5s ease;
+  }
+
+  section:hover {
+    border-color: rgba(61,220,151,0.35);
+    transform: translateY(-2px);
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin: 0 0 20px;
+    color: #d5fff0;
+    letter-spacing: .04em;
+  }
+
+  .steps { list-style: none; padding: 0; margin: 0; }
+
+  .steps li {
+    position: relative;
+    padding: 14px 0 14px 44px;
+    border-bottom: 1px solid rgba(61,220,151,0.08);
+    line-height: 1.6;
+    color: #b9d8cb;
+  }
+
+  .steps li:last-child { border-bottom: none; }
+
+  .steps li::before {
+    content: attr(data-n);
+    position: absolute;
+    left: 0; top: 14px;
+    width: 28px; height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(61,220,151,0.12);
+    color: var(--accent);
+    font-size: .8rem;
+    border: 1px solid rgba(61,220,151,0.3);
+  }
+
+  /* ИИ-помощник */
+  .ai { }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .chip {
+    background: rgba(61,220,151,0.07);
+    border: 1px solid rgba(61,220,151,0.22);
+    color: #b8f0d9;
+    padding: 9px 16px;
+    border-radius: 999px;
+    font-size: .88rem;
+    cursor: none;
+    transition: all .35s ease;
+  }
+
+  .chip:hover {
+    background: rgba(61,220,151,0.2);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 18px rgba(61,220,151,0.25);
+  }
+
+  .answer {
+    min-height: 90px;
+    padding: 22px;
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(61,220,151,0.1);
+    line-height: 1.7;
+    color: #c4e6d8;
+    font-size: .98rem;
+    transition: opacity .4s ease;
+  }
+
+  .answer .placeholder { color: var(--muted); }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: .85rem;
+    margin-top: 56px;
+    line-height: 1.8;
+  }
+
+  @media (max-width: 600px) {
+    body { cursor: auto; }
+    .glow, .dot { display: none; }
+    .chip { cursor: pointer; }
+    section { padding: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow" id="glow"></div>
+<div class="dot" id="dot"></div>
+
+<div class="wrap">
+  <header>
+    <h1>MOTION</h1>
+    <p>Тихая инструкция о том, как жить дальше, когда случилось горе. Здесь можно просто быть.</p>
+  </header>
+
+  <section>
+    <h2>Если случилось горе — что делать сейчас</h2>
+    <ul class="steps">
+      <li data-n="1"><strong>Дышите.</strong> Медленный вдох на 4 счёта, выдох на 6. Тело первым выходит из шока.</li>
+      <li data-n="2"><strong>Не решайте всё сразу.</strong> В первые часы достаточно оставаться в безопасности и не оставаться одному.</li>
+      <li data-n="3"><strong>Позовите кого-то рядом.</strong> Друг, родственник, сосед — присутствие важнее слов.</li>
+      <li data-n="4"><strong>Пейте воду и ешьте хоть немного.</strong> Горе тратит силы физически.</li>
+      <li data-n="5"><strong>Разрешите себе не быть в порядке.</strong> Слёзы, онемение, злость — всё это нормальные реакции.</li>
+      <li data-n="6"><strong>Обратитесь за помощью.</strong> Психолог, кризисная линия, врач — это не слабость, а забота о себе.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Маленькие шаги на следующие дни</h2>
+    <ul class="steps">
+      <li data-n="1">Одна простая задача в день: душ, еда, короткая прогулка.</li>
+      <li data-n="2">Сон важнее порядка в доме. Ложитесь, даже если не спится.</li>
+      <li data-n="3">Пишите, если трудно говорить. Дневник или заметки в телефоне.</li>
+      <li data-n="4">Ограничьте новости и соцсети — берегите внимание.</li>
+      <li data-n="5">Помните: горе не линейно. Плохие дни — не откат назад.</li>
+    </ul>
+  </section>
+
+  <section class="ai">
+    <h2>ИИ-помощник для трудных случаев</h2>
+    <div class="chips" id="chips">
+      <div class="chip" data-case="panic">Паника и тревога</div>
+      <div class="chip" data-case="loss">Потеря близкого</div>
+      <div class="chip" data-case="guilt">Чувство вины</div>
+      <div class="chip" data-case="sleep">Не могу спать</div>
+      <div class="chip" data-case="alone">Очень одиноко</div>
+      <div class="chip" data-case="crisis">Мне очень плохо сейчас</div>
+    </div>
+    <div class="answer" id="answer">
+      <span class="placeholder">Выберите ситуацию — и помощник ответит спокойно и по шагам.</span>
+    </div>
+  </section>
+
+  <footer>
+    Если есть угроза жизни — звоните в экстренные службы.<br>
+    Этот сайт не заменяет врача или психолога, но может помочь сделать первый шаг.
+  </footer>
+</div>
+
+<script>
+  /* ——— Курсор и свечение ——— */
+  const glow = document.getElementById('glow');
+  const dot = document.getElementById('dot');
+  let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+  let gx = mx, gy = my;
+
+  window.addEventListener('mousemove', (e) => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.left = mx + 'px';
+    dot.style.top = my + 'px';
+  });
+
+  function animateGlow() {
+    gx += (mx - gx) * 0.08;
+    gy += (my - gy) * 0.08;
+    glow.style.left = gx + 'px';
+    glow.style.top = gy + 'px';
+    requestAnimationFrame(animateGlow);
+  }
+  animateGlow();
+
+  window.addEventListener('mouseleave', () => {
+    glow.style.opacity = 0; dot.style.opacity = 0;
+  });
+  window.addEventListener('mouseenter', () => {
+    glow.style.opacity = 1; dot.style.opacity = 1;
+  });
+
+  /* ——— ИИ-помощник (локальная база ответов) ——— */
+  const answers = {
+    panic: `Паника — это волна, и у неё есть пик. Он пройдёт.
+1. Поставьте обе стопы на пол. Назовите вслух 5 предметов, которые видите.
+2. Дыхание: вдох 4 — задержка 2 — выдох 6. Повторите 6 раз.
+3. Холодная вода на запястья или лицо — тело быстро «сбрасывает» тревогу.
+4. Скажите себе: «Это тревога, а не опасность. Я справлюсь с этой минутой».
+Если паника повторяется часто — обратитесь к врачу, это лечится.`,
+
+    loss: `Потеря близкого — одна из самых тяжёлых вещей в жизни. Здесь нет «правильно».
+• В первые дни достаточно базового: вода, еда, сон, кто-то рядом.
+• Не нужно быть сильным для других — позвольте себе горевать.
+• Ритуалы прощания помогают: похороны, поминание, письмо человеку.
+• Горе не имеет срока. Волны могут накатывать через месяцы — это нормально.
+• Если через несколько недель нет сил вставать, есть мысли о смерти — обратитесь к психологу или врачу.`,
+
+    guilt: `Чувство вины — частый спутник горя. Оно часто громче правды.
+1. Отделите факты от чувств: что реально было в вашей власти, а что нет?
+2. Спросите себя: «Что бы мне сказал человек, о котором я горю?»
+3. Вина ищет наказания. Попробуйте заменить её заботой: сделайте что-то доброе в память.
+4. Проговорите вину вслух с кем-то — она становится меньше, когда её слышат.
+5. Если вина не отпускает неделями — это работа для психолога.`,
+
+    sleep: `Сон первым страдает в горе. Не заставляйте себя — создайте условия.
+• Одно и то же время подъёма, даже если спали плохо.
+• За час до сна — без экрана. Тёплый свет, тишина.
+• Если не спится 20 минут — встаньте, посидите в полутьме, вернитесь.
+• Не лежите в кровати днём — кровать только для сна.
+• Дыхание 4–7–8: вдох 4, задержка 7, выдох 8.
+Если бессонница держится больше 2–3 недель — скажите об этом врачу.`,
+
+    alone: `Одиночество в горе особенно острое. И это можно смягчить.
+1. Один человек — уже опора. Напишите тому, кому доверяете: «Мне трудно, можешь побыть рядом?»
+2. Короткий контакт лучше долгого: 5 минут звонка, сообщение, совместный чай.
+3. Выходите туда, где люди: парк, магазин, библиотека. Присутствие других уже помогает.
+4. Заботьтесь о ком-то — питомец, растение, сосед. Забота возвращает связь.
+5. Если одиночество стало постоянным — это повод для терапии, а не приговор.`,
+
+    crisis: `Если сейчас очень плохо — вы важны, и это можно пережить.
+• Вызовите скорую или позвоните на кризисную линию. Это нормально — просить помощь.
+• Позвоните близкому: скажите прямо — «мне нужна поддержка сейчас».
+• Не оставайтесь один: перейдите в другую комнату, к людям, на улицу.
+• Уберите на время то, что может навредить.
+• Дышите: вдох 4 — выдох 6. Одна минута за другой.
+Вы уже сделали шаг — открыли этот текст. Дальше — по одному шагу.`
+  };
+
+  const answerBox = document.getElementById('answer');
+
+  document.getElementById('chips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    const key = chip.dataset.case;
+    answerBox.style.opacity = 0;
+    setTimeout(() => {
+      answerBox.innerHTML = answers[key].replace(/\n/g, '<br>');
+      answerBox.style.opacity = 1;
+    }, 220);
+  });
+</script>
+</body>
+  </html>
